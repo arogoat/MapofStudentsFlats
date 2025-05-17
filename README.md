@@ -12,13 +12,13 @@
 🧭 Custom marker colors and dynamic layer styling.</p>
 
 <h1>🚀 Technologies Used</h1>
-
-<p>HTML + CSS + vanilla JavaScript<br>
-MapLibre GL JS for open-source interactive maps<br>
-OpenFreeMap for map tile styling<br>
-Google Sheets as a CMS-like backend<br>
-opensheet.elk.sh API to pull spreadsheet data as JSON<br>
-</p>
+<ul>
+<li>HTML + CSS + vanilla JavaScript</li>
+<li>MapLibre GL JS for open-source interactive maps</li>
+<li>OpenFreeMap for map tile styling</li>
+<li>Google Sheets as a CMS-like backend</li>
+<li>opensheet.elk.sh API to pull spreadsheet data as JSON</li>
+</ul>
 
 <h1>🏗️ How I built this project</h1>
 <p>This project was created from scratch based on a real need: to help students easily browse and compare apartments visually on a map. Here's a breakdown of how it came together:</p>
@@ -32,14 +32,48 @@ opensheet.elk.sh API to pull spreadsheet data as JSON<br>
 </ul>
 
 <h2>Custom Markers & Dynamic Styling</h2>
-<l1>Points are rendered using map.addLayer() with a "circle" layer.</l1>
-<li>Color-coded each marker dynamically using ["match", ["get", "typ"]].</li>
+<l1>Points are rendered using `map.addLayer()` with a `"circle"` layer.</l1>
+<li>Color-coded each marker dynamically using `["match", ["get", "typ"]]`.</li>
 <li>Marker colors:
+🔴 `kawalerka`: red
 
-🔴 kawalerka: red
+🟢 `2-pokojowe`: green
 
-🟢 2-pokojowe: green
+🔵 `3-pokojowe`: blue
 
-🔵 3-pokojowe: blue
+🟣 `4-pokojowe`: purple
+</li>
 
-🟣 4-pokojowe: purple</li>
+<h2>Google Sheets as a CMS</h2>
+<ul>
+  <li>Apartment data is added manually in a Google Sheet.</li>
+  <li>Accessed via `https://opensheet.elk.sh/{sheetID}/{tabName}`</li>
+  <li>Auto-refreshed every 15 seconds using `setInterval(fetchData, 15000)`</li>
+</ul>
+
+<h2>UI/UX & Responsiveness</h2>
+<ul>
+  <li>Two separate layouts:</li>
+  <ul>
+    <li>Desktop: full map, sidebar, legend</li>
+    <li>Mobile: custom skyscraper background, floating billboard interface</li>
+  </ul>
+  <li>Interactive elements:</li>
+  <ul>
+    <li>📌 Legend toggle</li>
+    <li>ℹ️ Instruction popup with dismiss button</li>
+    <li>📨 Contact panel in the bottom corner</li>
+    <li>🛠️ “Report Listing” button per apartment</li>
+  </ul>
+</ul>
+
+<h2>Deployment-Ready</h2>
+<ul>
+  <li>SEO-optimized `(<meta name="description">)`</li>
+  <li>Includes favicon and mobile-friendly backgrounds</li>
+  <li>Ready to host statically (e.g. GitHub Pages, Netlify)</li>
+</ul>
+
+<h1>📫 Contact</h1>
+<p>Made with 💻 by AroGoat</p>
+<p>📧 Email: zenekorgin@gmail.com</p>
