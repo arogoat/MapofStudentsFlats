@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2047748593355011"
+     crossorigin="anonymous"></script>
+  <meta charset="UTF-8" />
+  <title>Mieszkania Kraków</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://unpkg.com/maplibre-gl/dist/maplibre-gl.js"></script>
+  <link href="https://unpkg.com/maplibre-gl/dist/maplibre-gl.css" rel="stylesheet" />
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="stylesmap.css">
+</head>
+<body>
+  <div id="instruction" class="instruction-banner">
+  Kliknij na marker, aby zobaczyć szczegóły mieszkania
+  <button class="close-instruction" onclick="hideInstruction()">❌</button>
+</div>
+
+  <div class="desktop-only">
+    <div id="map"></div>
+
+    <div class="legend-toggle" onclick="toggleLegend()">📌 Legenda</div>
+<div class="legend" id="legend-box">
+  <strong>Legenda</strong>
+  <div><span class="color-box" style="background-color: #ff3333;"></span> Kawalerka</div>
+  <div><span class="color-box" style="background-color: #33cc33;"></span> 2-pokojowe</div>
+  <div><span class="color-box" style="background-color: #62c2ee;"></span> 3-pokojowe</div>
+  <div><span class="color-box" style="background-color: #cc61f7;"></span> 4-pokojowe</div>
+  <hr />
+  <a href="https://docs.google.com/forms/d/e/1FAIpQLSdOaZtgnFBLZXORA3AGpP86sUQpFay56juBhUSRO2p0mH5M2w/viewform?usp=dialog" target="_blank" class="form-link">Zaproponuj mieszkanie</a>
+   <hr />
+  <a href="https://docs.google.com/forms/d/e/1FAIpQLSeTUpVSojdV0jk18P1Ol2hMoEPMaJ0fhrJ1mfbbCGCnIy2p8Q/viewform?usp=dialog" target="_blank" class="form-link">Zgłoś problem z ogłoszeniem</a>
+</div>
+
+    <div id="info-panel"></div>
+  </div>
+  <script>
+    const map = new maplibregl.Map({
+      container: "map",
+      style: "https://tiles.openfreemap.org/styles/bright",
+      center: [19.93626, 50.06134],
+      zoom: 11.5
+    });
+
+    function fetchFlats() {
+      fetch("https://opensheet.elk.sh/1KMSbDQCHp3aIkBQvZSTN1ptAubeUXnQijvSh_0drwwI/mieszkaniakrakow")
+        .then(res => res.json())
+        .then(data => {
+          const features = data.map(row => ({
+            type: "Feature",
+            geometry: {
+              type: "Point",
+              coordinates: [parseFloat(row.longitude), parseFloat(row.latitude)]
+            },
+            properties: {
+              title: row.title,
+              typ: row.typ,
+              opis: row.opis,
+              cena: row.cena,
+              image: row.image,
+              link: row.link
+            }
+          }));
+
+          const geojson = {
+            type: "FeatureCollection",
+            features: features
+          };
+
+          if (map.getSource("flats")) {
+            map.getSource("flats").setData(geojson);
+          } else {
+            map.addSource("flats", {
+              type: "geojson",
+              data: geojson
+            });
+
+            map.addLayer({
+              id: "flats-layer",
+              type: "circle",
+              source: "flats",
+              paint: {
+                "circle-radius": 8,
+                "circle-color": [
+                  "match",
+                  ["get", "typ"],
+                  "kawalerka", "#ff3333",
+                  "2-pokojowe", "#33cc33",
+                  "3-pokojowe", "#62c2ee",
+                  "4-pokojowe", "#cc61f7",
+                  "#999999"
+                ],
+                "circle-stroke-color": "#ffffff",
+                "circle-stroke-width": 2
+              }
+            });
+
+            map.on("click", "flats-layer", (e) => {
+              const feature = e.features[0];
+              const panel = document.getElementById("info-panel");
+              panel.innerHTML = `
+                <h2 class="title">${feature.properties.title}</h2>
+                <img class="image" src="${feature.properties.image}" style="width: 100%; height: auto; margin-bottom: 10px;">
+                <p class="cena">Cena: ${feature.properties.cena} + opłaty</p>
+                <p class="opis">${feature.properties.opis}</p>
+                <a class="link" href="${feature.properties.link}" target="_blank">Zobacz Ofertę</a>
+              `;
+              panel.style.display = "block";
+            });
+
+            map.on("click", (e) => {
+              const features = map.queryRenderedFeatures(e.point, { layers: ["flats-layer"] });
+              if (features.length === 0) {
+                document.getElementById("info-panel").style.display = "none";
+              }
+            });
+
+            map.on("mouseenter", "flats-layer", () => {
+              map.getCanvas().style.cursor = "pointer";
+            });
+
+            map.on("mouseleave", "flats-layer", () => {
+              map.getCanvas().style.cursor = "";
+            });
+          }
+        });
+    }
+
+    map.on("load", () => {
+      fetchFlats();
+      setInterval(fetchFlats, 15000); // auto-aktualizacja co 15s
+    });
+  </script>
+  <script>
+  function toggleLegend() {
+    const legend = document.getElementById("legend-box");
+    legend.style.display = (legend.style.display === "block") ? "none" : "block";
+  }
+</script>
+<script>
+  function hideInstruction() {
+    const instruction = document.getElementById("instruction");
+    if (instruction) instruction.style.display = "none";
+  }
+</script>
+<div class="contact-toggle" onclick="toggleContact()">📩 Kontakt</div>
+
+<div class="contact-panel" id="contact-panel">
+  <strong>Arkadiusz K.</strong><br>
+  <a href="mailto:taniemieszkaniedlastudenta@gmail.com">taniemieszkaniedlastudenta@gmail.com</a>
+</div>
+<script>
+  function toggleContact() {
+    const panel = document.getElementById("contact-panel");
+    panel.style.display = (panel.style.display === "block") ? "none" : "block";
+  }
+</script>
+</body>
+</html>
